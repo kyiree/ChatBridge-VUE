@@ -1,8 +1,5 @@
 一个前后端分离的GPT项目，后端工程在这里https://github.com/kyiree/ChatBridge-JAVA
 
-
-![Uploading 微信截图_20231229003440.png…]()
-
 ## 安装依赖
 ```
 npm install
