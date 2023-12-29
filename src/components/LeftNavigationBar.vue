@@ -6,7 +6,7 @@
           :size="70"
           :icon="UserFilled"
           :src="
-          store.getters.userinfo.avatar
+          store.getters.userinfo && store.getters.userinfo.avatar
             ? imageUrl + store.getters.userinfo.avatar
             : require('../assets/logoHead.svg')
         "

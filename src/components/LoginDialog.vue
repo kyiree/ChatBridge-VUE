@@ -16,54 +16,12 @@
         </div>
         <div class="login-title">
           <div
-            :class="loginType === 0 ? 'login-selected' : ''"
-            @click="switchLoginType(0)"
-          >
-            微信登录
-          </div>
-          <div
             :class="loginType === 1 ? 'login-selected' : ''"
             @click="switchLoginType(1)"
           >
             {{ isLogin ? "邮箱登录" : "注册账号" }}
           </div>
         </div>
-        <!--微信扫码登录-->
-        <div v-if="loginType === 0">
-          <div class="form">
-            <div class="animation" v-if="!qrCodeLoaded">
-              <view class="loading-model">
-                <view class="loader"></view>
-              </view>
-            </div>
-            <div class="content" v-if="qrCode">
-              <div style="position: relative; border-radius: 5px">
-                <img
-                  :src="qrCode"
-                  class="qc_code"
-                  :class="store.getters.themeInfo.className"
-                  alt="二维码"
-                />
-                <div class="cover-div" v-if="isFailure">二维码已失效</div>
-              </div>
-            </div>
-          </div>
-          <div class="btn-generate" v-if="isFailure">
-            <el-button
-              type="primary"
-              color="var(--themeColor2)"
-              @click="getLoginQRCode()"
-              >重新生成
-            </el-button>
-          </div>
-          <div class="h5 prompt-style" v-if="!loginAnimation">
-            正在加载中...
-          </div>
-          <div class="h5 prompt-style" v-if="!promptAnimation">
-            使用微信扫一扫快速登录后使用
-          </div>
-        </div>
-        <!--登录-->
         <div
           v-if="loginType === 1"
           style="margin-top: 40px; padding: 0 60px 50px"
@@ -316,7 +274,7 @@ export default defineComponent({
   setup(props, { emit }) {
     let store = useStore();
     const buttonText = ref("获取验证码");
-    let loginType = ref(0);
+    let loginType = ref(1);
     let qrCode = ref("");
     let qrCodeLoaded = ref(false);
     let promptAnimation = ref(true);
@@ -487,7 +445,7 @@ export default defineComponent({
           if (!lock.value) {
             lock.value = true;
             clearInterval(timerId);
-            localStorage.setItem("token", promise);
+            localStorage.setItem("token", promise.token);
             dialogVisible.value = false;
             loginLoading.value = false;
             try {
@@ -500,7 +458,7 @@ export default defineComponent({
             clearInterval(timerId);
             ElNotification({
               title: "登录成功",
-              message: "欢迎使用TIME SEA PLUS",
+              message: "欢迎使用CHAT BRIDGE",
               type: "success",
             });
             emit("loginSucceeded");

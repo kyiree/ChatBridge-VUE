@@ -11,6 +11,7 @@ module.exports = defineConfig({
     // 静态资源存放的文件夹(相对于outputDir)
     assetsDir: "assets",
     configureWebpack: {
+        devtool: 'source-map',
         plugins: [
             new CompressionPlugin({
                 algorithm: 'gzip', // 使用gzip压缩
@@ -28,10 +29,10 @@ module.exports = defineConfig({
                         compress: {
                             drop_console: true
                         },
-                        mangle: true, // 开启代码混淆
-                        output: {
-                            comments: true // 删除注释
-                        }
+                        //mangle: true, // 开启代码混淆
+                     //   output: {
+                    //        comments: true // 删除注释
+                    //    }
                     }
                 })
             ]

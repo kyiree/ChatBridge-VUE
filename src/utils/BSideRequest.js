@@ -27,8 +27,8 @@ service.interceptors.request.use(config => {
 // TODO 响应拦截器
 service.interceptors.response.use(response => {
     const res = response.data;
-    if (res.code !== 200) {
-        if (res.code === 401) {
+    if (response.status !== 200) {
+        if (response.status === 401) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             location.reload();
