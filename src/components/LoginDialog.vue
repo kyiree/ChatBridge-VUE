@@ -154,7 +154,7 @@
         </div>
         <div style="padding: 20px 40px 30px">
           <div class="login-title">
-            <div class="login-selected">TIME SEA PLUS</div>
+            <div class="login-selected">CHAT BRIDGE</div>
           </div>
           <el-form @keyup.enter="retrievePassword" ref="formRef" size="large">
             <el-form-item prop="username">
@@ -254,7 +254,6 @@ import {
   EmailLogin,
   getEmailCode,
   GetUserInfo,
-  GetWechatCode,
   isQrCodeLoginSucceed,
   RetrieveEmailPassword,
 } from "../../api/BSideApi";
@@ -301,7 +300,6 @@ export default defineComponent({
       () => props.show,
       (newValue) => {
         if (newValue) {
-          getLoginQRCode();
           dialogVisible.value = true;
         }
       },
@@ -318,7 +316,6 @@ export default defineComponent({
     function switchLoginType(type) {
       clearInterval(timerId);
       if (type === 0) {
-        getLoginQRCode();
       }
       loginType.value = type;
     }
@@ -411,28 +408,6 @@ export default defineComponent({
       }
     }
 
-    /**
-     * 获取登录二维码
-     */
-    async function getLoginQRCode() {
-      try {
-        clearInterval(timerId);
-        let newVar = await GetWechatCode();
-        if (newVar) {
-          isFailure.value = false;
-          verifyCode.value = newVar.verifyCode;
-          qrCode.value = newVar.qrCode;
-          qrCodeLoaded.value = true;
-          loginAnimation.value = true;
-          promptAnimation.value = false;
-          timerId = setInterval(() => {
-            scanCodeLoginResults();
-          }, 2000);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    }
 
     /**
      * 扫码登录结果
@@ -508,7 +483,7 @@ export default defineComponent({
         loginLoading.value = false;
         ElNotification({
           title: "登录成功",
-          message: "快登录体验TIME SEA PLUS吧",
+          message: "快登录体验CHAT BRIDGE吧",
           type: "success",
         });
         loginLoading.value = false;
@@ -580,7 +555,6 @@ export default defineComponent({
       isPassword,
       close,
       isLogin,
-      getLoginQRCode,
       isFailure,
       loginType,
       switchLoginType,

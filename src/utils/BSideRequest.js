@@ -35,6 +35,8 @@ service.interceptors.response.use(response => {
         } else {
             throw res.msg
         }
+    } if (res.code != 0) {
+        throw res.msg
     } else {
         return res.data
     }
