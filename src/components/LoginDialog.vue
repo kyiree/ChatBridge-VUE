@@ -520,6 +520,7 @@ export default defineComponent({
           type: "success",
         });
         loginLoading.value = false;
+        isLogin.value = true;
       } catch (e) {
         loginLoading.value = false;
         ElNotification({
