@@ -471,7 +471,7 @@ export default defineComponent({
       loginLoading.value = true;
       try {
         let promise = await EmailLogin(emailForm.value);
-        localStorage.setItem("token", promise);
+        localStorage.setItem("token", promise.token);
         try {
           let res = await GetUserInfo();
           store.commit("setUserinfo", res);
