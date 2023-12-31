@@ -479,10 +479,8 @@ export default {
         socket.value = new WebSocket(
             process.env.VUE_APP_WSS +
             "/gpt-web/api/" +
-            localStorage.getItem("token") +
-            "/" +
-            model.value
-        );
+            localStorage.getItem("token")
+          );
         // TODO 建立连接
         socket.value.onopen = function () {
           socket.value.send(JSON.stringify(messages));
