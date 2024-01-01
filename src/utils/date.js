@@ -1,5 +1,3 @@
-
-
 export function conversionTime(time) {
     const minute = 1000 * 60;
     const hour = minute * 60;

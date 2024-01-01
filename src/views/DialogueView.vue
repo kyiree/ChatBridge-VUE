@@ -108,12 +108,12 @@
             @click="clear"
             v-show="store.getters.userinfo && !aiLoading"
         >
-          <div style="padding-top: 4px">
+          <div style="padding-top: 4px" @click="gptSessionId = ''">
             <el-icon size="13px" style="padding-right: 3px">
               <Clock/>
             </el-icon>
           </div>
-          <div>清除聊天</div>
+          <div @click="gptSessionId = ''">清除聊天</div>
         </div>
         <div
             class="clear2"
@@ -221,7 +221,7 @@ import {
   VideoPause,
 } from "@element-plus/icons-vue";
 import {ElNotification} from "element-plus";
-import {FavoritesAdd, GetUserInfo} from "../../api/BSideApi";
+import {FavoritesAdd, GetUserInfo, GetChatSessionId} from "../../api/BSideApi";
 import {useStore} from "vuex";
 import LoginDialog from "@/components/LoginDialog.vue";
 import InputFormField from "@/components/InputFormField.vue";
@@ -270,6 +270,7 @@ export default {
     const rate = ref(50);
     const memory = ref(10);
     const size = ref(1000);
+    let gptSessionId = ref("");
     onMounted(() => {
       window.addEventListener("resize", handleResize);
       handleResize();
@@ -426,6 +427,10 @@ export default {
       scrollToTheBottom();
       // TODO 上下文
       let messages = [];
+      if(!gptSessionId.value) {
+        let gptSessionVo = await GetChatSessionId();
+        gptSessionId.value = gptSessionVo.sessionId;
+      }
       conversationList.value
           .slice(-memory.value)
           .forEach(({isError, user, assistant}, index, arr) => {
@@ -473,13 +478,12 @@ export default {
         }
 
         // 发起websocket
-
         console.log("发起websocket", model.value);
 
         socket.value = new WebSocket(
             process.env.VUE_APP_WSS +
             "/gpt-web/api/" +
-            localStorage.getItem("token")
+            localStorage.getItem("token") + "/" + gptSessionId.value
           );
         // TODO 建立连接
         socket.value.onopen = function () {
@@ -671,6 +675,7 @@ export default {
       calculateWidth,
       initialWidth,
       maxWidth,
+      gptSessionId,
     };
   },
 };

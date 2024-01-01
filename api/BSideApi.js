@@ -346,7 +346,7 @@ export function SendAMessage(data) {
  */
 export function Favorites(data) {
     return request({
-        url: '/user/star/get/web',
+        url: '/star/page',
         method: 'GET',
         data
     })
@@ -407,7 +407,7 @@ export function UseExchangeCode(data) {
  */
 export function FavoritesAdd(data) {
     return request({
-        url: '/user/stat/put/data',
+        url: '/star',
         method: 'POST',
         data
     })
@@ -418,7 +418,7 @@ export function FavoritesAdd(data) {
  */
 export function FavoritesDel(data) {
     return request({
-        url: '/user/star/delete/' + data,
+        url: '/star/delete/' + data,
         method: 'POST'
     })
 }
@@ -439,6 +439,16 @@ export function GetWechatCode() {
 export function isQrCodeLoginSucceed(data) {
     return request({
         url: '/auth/wechat/code/result?verifyCode=' + data,
+        method: 'GET'
+    })
+}
+
+/**
+ * 获取对话凭证
+ */
+export function GetChatSessionId() {
+    return request({
+        url: '/gpt/session-id',
         method: 'GET'
     })
 }

@@ -146,15 +146,10 @@
             padding-top: 40px;
           "
         >
-          <img
-            src="../assets/logoHead.svg"
-            style="width: 60px; height: 60px"
-            alt=""
-          />
         </div>
         <div style="padding: 20px 40px 30px">
           <div class="login-title">
-            <div class="login-selected">CHAT BRIDGE</div>
+            <div class="login-selected">找回密码</div>
           </div>
           <el-form @keyup.enter="retrievePassword" ref="formRef" size="large">
             <el-form-item prop="username">
@@ -356,6 +351,9 @@ export default defineComponent({
         });
         passwordLoading.value = false;
         isPassword.value = false;
+        // 打开登录对话框
+        dialogVisible.value = true;
+        isLogin.value = true;
       } catch (e) {
         ElNotification({
           title: "错误",

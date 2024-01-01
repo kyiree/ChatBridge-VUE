@@ -6,8 +6,8 @@ const routes = [{
     name: 'Index',
     component: () => import('../views/DialogueView.vue'),
     meta: {
-        title: '智能问答', // TODO 浏览器标题
-        isHeadNavigation: true, // TODO 是否显示tab
+        title: '智能问答', 
+        isHeadNavigation: true, 
         keepAlive: true,
         isLeftMenu: true
     }
