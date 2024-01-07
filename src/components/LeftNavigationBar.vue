@@ -109,11 +109,6 @@ export default defineComponent({
         to: "/",
       },
       {
-        title: "预设角色",
-        icon: Odometer,
-        to: "/preset_character",
-      },
-      {
         title: "历史对话",
         icon: MessageBox,
         to: "/collection",

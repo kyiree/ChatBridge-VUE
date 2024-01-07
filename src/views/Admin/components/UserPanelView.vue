@@ -24,7 +24,7 @@
       <el-table-column prop="userName" label="昵称" />
       <el-table-column prop="frequency" label="Ai币" />
       <el-table-column prop="email" label="邮箱" />
-      <el-table-column prop="lastOperationTime" label="最后操作时间" />
+      <el-table-column prop="lastLoginTime" label="最后登录时间" />
       <el-table-column prop="createdTime" label="创建时间" />
       <el-table-column fixed="right" label="操作" width="200">
         <template #header>
@@ -32,7 +32,7 @@
             style="width: 180px"
             v-model="prompt"
             size="small"
-            placeholder="模糊搜索"
+            placeholder="模糊搜索：昵称"
             @change="search"
           />
         </template>
@@ -95,7 +95,6 @@
 import { onMounted, ref } from "vue";
 import store from "@/store";
 import {
-  GetUserCount,
   GetUserInfo,
   GetUserPage,
   UpdateUserInfo,
@@ -128,7 +127,7 @@ export default {
     });
     onMounted(() => {
       if (store.getters.userinfo && store.getters.userinfo.type === "ADMIN") {
-        getUserCount();
+    
         handleCurrentChange(current.value);
       }
     });
@@ -194,35 +193,28 @@ export default {
       }
     }
 
-    async function getUserCount() {
-      try {
-        amount.value = await GetUserCount();
-      } catch (e) {
-        console.log(e);
-      }
-    }
-
     async function handleCurrentChange(pageNum) {
       try {
-        let res = await GetUserPage(pageNum, prompt.value);
-        let records = res.records;
+        let res = await GetUserPage({current:pageNum,search:prompt.value});
+        let records = res.rows;
+        amount.value = res.total;
         if (records.length > 0) {
           records.forEach((r) => {
             if (!r.email) {
               r.email = "--";
             }
             if (!r.userName) {
-              r.userName = "用户未设置昵称";
+              r.userName = "--";
             }
-            if (!r.lastOperationTime) {
-              r.lastOperationTime = "7天前";
+            if (!r.lastLoginTime) {
+              r.lastLoginTime = "--";
             } else {
-              r.lastOperationTime = conversionTime(r.lastOperationTime);
+              r.lastLoginTime = conversionTime(r.lastLoginTime);
             }
             r.createdTime = conversionTime(r.createdTime);
           });
           dataTables.value = records;
-          current.value = res.current;
+          current.value = pageNum;
           total.value = res.total;
         } else {
           empty.value = true;

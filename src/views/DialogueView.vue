@@ -54,7 +54,7 @@
             <div style="width: 100%">
               <div
                   class="answer-data"
-                  :style="{ maxWidth: calculateWidth(item.role.length) }"
+                  :style="{ maxWidth: calculateWidth(item.content.length) }"
               >
                 <v-md-editor
                     :model-value="item.content"

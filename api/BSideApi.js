@@ -111,10 +111,11 @@ export function PutTerminal(data) {
 /**
  *    获取分页用户数据
  */
-export function GetUserPage(a, b) {
+export function GetUserPage(params) {
     return request({
-        url: '/admin/user/get/page?pageNum=' + a + '&prompt=' + b,
-        method: 'GET'
+        url: '/admin/user/page',
+        method: 'GET',
+        params
     })
 }
 
@@ -254,16 +255,6 @@ export function UpdateUserInfo(data) {
         url: '/admin/user/put/data',
         method: 'POST',
         data
-    })
-}
-
-/**
- *    获取平台总人数
- */
-export function GetUserCount() {
-    return request({
-        url: '/admin/user/get/count',
-        method: 'GET'
     })
 }
 
