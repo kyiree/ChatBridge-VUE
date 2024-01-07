@@ -114,7 +114,7 @@ export default defineComponent({
         to: "/preset_character",
       },
       {
-        title: "我的收藏",
+        title: "历史对话",
         icon: MessageBox,
         to: "/collection",
       },

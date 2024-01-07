@@ -2,13 +2,13 @@
   <ViewState
     v-if="!store.getters.userinfo"
     Type="error"
-    ErrorText="登录查看收藏"
+    ErrorText="登录查看对话"
     IsShowBottom
     ButtonText="登录"
     @ClickTheButton="loginVisible = true"
   />
   <ViewState v-else-if="load" LoadText="正在加载，请稍后..." />
-  <ViewState v-else-if="empty" Type="empty" ErrorText="暂无收藏的数据" />
+  <ViewState v-else-if="empty" Type="empty" ErrorText="暂无对话数据" />
   <ViewState
     v-else-if="error"
     @ClickTheButton="init"
@@ -22,57 +22,74 @@
     <div :class="seeIndex !== -1 ? 'containerOpen' : ''" class="container">
       <el-scrollbar height="100%" class="leftContent">
         <div v-for="(item, index) in list" :key="index" class="item">
-          <div class="name">{{ item.issue }}</div>
-          <div class="time">收藏于{{ conversionTime(item.createdTime) }}</div>
+          <div class="name">{{ item.title }}</div>
+          <div class="time">对话于{{ conversionTime(item.createdTime) }}</div>
           <div v-if="!item.isError" class="operation">
             <div
-              @click="seeIndex = index"
+            @click.stop="getDialogueList(item.sessionId)"
               class="operationItem operationItemSelected"
             >
               <el-icon size="14">
                 <Promotion />
               </el-icon>
-              <div class="operationExplain">查看</div>
+              <div
+               class="operationExplain" >查看</div>
             </div>
             <div
-              @click="cancelCollection(item.starId, index)"
+              @click="deleteSession(item.sessionId, index)"
               class="operationItem"
               :class="item.isCollection ? 'operationItemSelected' : ''"
             >
               <el-icon size="14">
-                <Star />
+                <Delete />
               </el-icon>
-              <div class="operationExplain">取消收藏</div>
+              <div class="operationExplain">删除对话</div>
             </div>
           </div>
         </div>
       </el-scrollbar>
-      <el-scrollbar v-if="seeIndex !== -1" height="100%" class="rightContent">
-        <div class="title">{{ list[seeIndex].issue }}</div>
-        <div class="desc">
-          <v-md-editor
-            :model-value="list[seeIndex].answer"
-            mode="preview"
-            @copy-code-success="handleCopyCodeSuccess"
-          />
-        </div>
-      </el-scrollbar>
     </div>
+    <div class="block">
+      <el-pagination
+        v-if="list.length > 0"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="state.pagination.current"
+        :page-sizes="[10, 20, 30, 40]"
+        :page-size="state.pagination.size"
+        layout="total, sizes, prev, pager, next, jumper"
+        background
+       :total="state.pagination.total">
+      </el-pagination>
+    </div>
+    
+    <el-dialog v-model="dialogVisible" title="历史对话">
+      <div v-for="(dialogue, index) in dialogueList" :key="index" class="dialogue-item">
+        <div v-if="dialogue.role === 'user'" class="user-content">
+          <p>{{ dialogue.content }}</p>
+        </div>
+        <div v-else class="assistant-content">
+          <p>{{ dialogue.content }}</p>
+        </div>
+      </div>
+    </el-dialog>
   </div>
   <LoginDialog
     :show="loginVisible"
     @close="loginVisible = false"
     @loginSucceeded="init"
   />
+
 </template>
 
 <script>
 import ViewState from "@/components/ViewState.vue";
-import { onMounted, ref } from "vue";
-import { Favorites, FavoritesDel } from "../../api/BSideApi";
-import { Promotion, Star } from "@element-plus/icons-vue";
+import { reactive,onMounted, toRefs,ref } from "vue";
+import {GetSessionPage,DeleteSession,GetDialogueList} from "../../api/BSideApi";
+import { Delete, Promotion, Star } from "@element-plus/icons-vue";
 import { ElMessageBox, ElNotification } from "element-plus";
 import LoginDialog from "@/components/LoginDialog.vue";
+import DialogueView from "@/views/DialogueView.vue";
 import store from "@/store";
 import { conversionTime } from "@/utils/date";
 
@@ -84,7 +101,7 @@ export default {
       return store;
     },
   },
-  components: { LoginDialog, Star, Promotion, ViewState },
+  components: { LoginDialog, Star, Promotion, ViewState, Delete ,DialogueView},
   setup() {
     let load = ref(false);
     let empty = ref(false);
@@ -92,6 +109,15 @@ export default {
     let list = ref([]);
     let seeIndex = ref(-1);
     let loginVisible = ref(false);
+    let dialogueList = ref([]);
+    let dialogVisible = ref(false);
+    const state = reactive({
+      pagination: {
+        current: 1,
+        size: 10,
+        total: 0,
+      },
+    });
 
     onMounted(() => {
       if (store.getters.userinfo) init();
@@ -100,9 +126,13 @@ export default {
     async function init() {
       try {
         load.value = true;
-        let res = await Favorites();
-        if (res.length) {
-          list.value = res;
+        let res = await GetSessionPage({
+          current: state.pagination.current,
+          size: state.pagination.size
+        });
+        if (res.total) {
+          list.value = res.rows;
+          state.pagination.total = res.total;
         } else {
           empty.value = true;
         }
@@ -114,22 +144,45 @@ export default {
       }
     }
 
-    async function cancelCollection(id, index) {
+    async function deleteSession(sessionId, index) {
       try {
         await ElMessageBox({
           title: "提示",
-          message: "取消收藏后数据将不可找回，是否确认取消该收藏",
-          confirmButtonText: "取消收藏",
+          message: "删除对话后数据将不可找回，是否确认删除该对话",
+          confirmButtonText: "删除对话",
           cancelButtonText: "再想想",
           showCancelButton: true,
           type: "warning",
         });
-        await FavoritesDel(id);
+        await DeleteSession({sessionId:sessionId});
+        ElNotification({
+        message: "删除成功",
+        type: "success",
+      });
         list.value.splice(index, 1);
         if (seeIndex.value === index) seeIndex.value = -1;
       } catch (e) {
-        console.log("取消收藏");
+        console.log("删除对话", e);
       }
+    }
+
+    async function getDialogueList(sessionId) {
+      const response = await GetDialogueList({ sessionId: sessionId });
+      dialogueList.value = response.rows;
+      dialogVisible.value = true;
+    }
+
+    // 处理页码变化
+    function handleCurrentChange(newPage) {
+      state.pagination.current = newPage;
+      init();
+    }
+
+    // 处理每页条目数变化
+    function handleSizeChange(newSize) {
+      state.pagination.size = newSize;
+      state.pagination.current = 1; 
+      init();
     }
 
     // TODO 复制代码块
@@ -147,10 +200,16 @@ export default {
       error,
       init,
       list,
-      cancelCollection,
+      deleteSession,
       seeIndex,
       handleCopyCodeSuccess,
       loginVisible,
+      handleCurrentChange,
+      handleSizeChange,
+      state,
+      dialogueList,
+      getDialogueList,
+      dialogVisible
     };
   },
 };
@@ -283,5 +342,26 @@ export default {
   padding: 0 0 0 16px;
   color: var(--textColor1);
   background-color: var(--bgColor1);
+}
+.dialogue-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.user-content {
+  text-align: right;
+  flex: 1;
+}
+
+.assistant-content {
+  text-align: left;
+  flex: 1;
+}
+
+.questions {
+  width: 100%;
+  max-width: 900px;
+  box-sizing: border-box;
 }
 </style>

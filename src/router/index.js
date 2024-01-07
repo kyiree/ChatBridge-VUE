@@ -83,7 +83,7 @@ const routes = [{
         name: 'Collection',
         component: () => import('../views/CollectionView.vue'),
         meta: {
-            title: '我的收藏',
+            title: '历史对话',
             isHeadNavigation: true,
             keepAlive: false,
             isLeftMenu: true

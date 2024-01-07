@@ -452,3 +452,36 @@ export function GetChatSessionId() {
         method: 'GET'
     })
 }
+
+/**
+ * 获取会话历史记录
+ */
+export function GetSessionPage(params) {
+    return request({
+        url: '/dialogue/session',
+        method: 'GET',
+        params
+    })
+}
+
+/**
+ * 获取某次会话的所有对话记录
+ */
+export function GetDialogueList(params) {
+    return request({
+        url: '/dialogue',
+        method: 'GET',
+        params
+    });
+}
+
+/**
+ * 删除某个会话
+ */
+export function DeleteSession(data) {
+    return request({
+        url: '/dialogue/session',
+        method: 'DELETE',
+        data
+    })
+}

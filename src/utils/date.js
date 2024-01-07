@@ -5,7 +5,8 @@ export function conversionTime(time) {
     const week = day * 7;
     const month = day * 30;
     const now = new Date().getTime();
-    const diffValue = now - time;
+    const timeDate = new Date(time).getTime();
+    const diffValue = now - timeDate;
     if (diffValue < 0) {
         return;
     }

@@ -1,6 +1,6 @@
 <template>
   <div class="body" ref="scrollRef">
-    <div v-if="!conversationList.length" class="explain">
+    <div v-if="!dialogueList || !dialogueList.length" class="explain">
       <img class="logo" alt="Vue logo" src="../assets/logo02.svg"/>
       <div class="expositoryCase">欢迎使用CHAT BRIDGE</div>
       <div class="consume">
@@ -13,15 +13,16 @@
     </div>
     <div v-else class="questions" style="margin: 20px 0">
       <div
-          v-for="(item, index) in conversationList"
+          v-for="(item, index) in dialogueList"
           :key="index"
           class="item slide-animation"
       >
+      <template v-if="item.role === 'user'">
         <div class="question">
           <div>
-            <div class="text">{{ item.user }}</div>
+            <div class="text">{{ item.content }}</div>
             <div class="operation--model_user">
-              <div class="op-btn" @click="copyAnswer(item.user)">
+              <div class="op-btn" @click="copyAnswer(item.content)">
                 <el-icon>
                   <CopyDocument/>
                 </el-icon>
@@ -39,8 +40,10 @@
                 : require('../assets/my.png')
             "
           />
+        
         </div>
-
+      </template>
+      <template v-if="item.role === 'assistant'">
         <div class="answer">
           <el-avatar
               class="flexShrink"
@@ -48,40 +51,30 @@
               :icon="UserFilled"
               :src="require('../assets/logoHead.svg')"
           />
-          <template v-if="item.assistant">
             <div style="width: 100%">
               <div
                   class="answer-data"
-                  :style="{ maxWidth: calculateWidth(item.assistant.length) }"
+                  :style="{ maxWidth: calculateWidth(item.role.length) }"
               >
                 <v-md-editor
-                    :model-value="item.assistant"
+                    :model-value="item.content"
                     mode="preview"
                     @copy-code-success="handleCopyCodeSuccess"
                 />
               </div>
 
               <div class="operation--model" v-if="!item.isError">
-                <div class="op-btn" @click="copyAnswer(item.assistant)">
+                <div class="op-btn" @click="copyAnswer(item.content)">
                   <el-icon>
                     <CopyDocument/>
                   </el-icon>
                   <text class="op-font">复制</text>
                 </div>
-                <div
-                    class="op-btn"
-                    @click="onCollection(item, index)"
-                    v-if="!item.isCollection"
-                >
-                  <el-icon color="rgb(255,236,160)">
-                    <StarFilled/>
-                  </el-icon>
-                  <text class="op-font">收藏</text>
-                </div>
               </div>
             </div>
-          </template>
-          <template v-else>
+        </div>
+      </template>
+      <!--template v-else>
             <div class="answer-data" style="width: 100px">
               <div style="display: flex; padding: 5px 9px">
                 <div class="dot_0"></div>
@@ -91,8 +84,7 @@
                 <div class="dot_4"></div>
               </div>
             </div>
-          </template>
-        </div>
+          </template-->
       </div>
     </div>
     <div class="suspend" v-show="aiLoading" @click="closeSocket">
@@ -114,18 +106,6 @@
             </el-icon>
           </div>
           <div @click="gptSessionId = ''">清除聊天</div>
-        </div>
-        <div
-            class="clear2"
-            v-show="store.getters.userinfo && !aiLoading"
-            @click="dialogueDisplay = true"
-        >
-          <div style="padding-top: 4px">
-            <el-icon size="13px" style="padding-right: 3px">
-              <ChatDotRound/>
-            </el-icon>
-          </div>
-          <div>记忆回溯</div>
         </div>
 
         <!--
@@ -151,7 +131,7 @@
     </div>
   </div>
   <el-dialog
-      v-model="dialogueDisplay"
+      v-model="sessionDisplay"
       title=""
       width="430px"
       center
@@ -162,40 +142,29 @@
         <img alt="Vue logo" src="../assets/logo02.svg" class="cache-img"/>
       </div>
       <div class="cache-text">CHAT BRIDGE</div>
-      <div class="cache-flex-center cache-padding-top">
-        <div class="cache-btn" @click="createdNewChat">
-          <el-icon size="16px">
-            <ChatLineSquare/>
-          </el-icon>
-          <div class="cache-btn-text">创建新的聊天</div>
-        </div>
-      </div>
       <div class="cache-content">
         <div class="cache-scrollbar">
           <el-scrollbar height="250px">
             <div
                 class="cache-padding"
-                v-for="(item, index) in dialogueCache.array"
-                :key="index"
+                v-for="(item) in sessionList"
             >
               <div class="cache-flex-space-between">
-                <div class="cache-message" @click="switchChat(index)">
+                <div class="cache-message" @click="switchChat(item.sessionId)">
                   <div class="cache-message-text">
                     {{ item.title }}
                   </div>
                   <div class="cache-message-time">
-                    {{ conversionTime(item.time) }}
+                    {{ conversionTime(item.createdTime) }}
                   </div>
                 </div>
                 <div class="cache-selected">
                   <img
                       :src="
-                      dialogueCache.index === index
-                        ? require('../assets/selected.svg')
-                        : require('../assets/close.svg')
+                      require('../assets/close.svg')
                     "
                       class="cache-selected-img"
-                      @click="clearDialogue(index)"
+                      @click="clearDialogue(item.sessionId)"
                   />
                 </div>
               </div>
@@ -221,7 +190,7 @@ import {
   VideoPause,
 } from "@element-plus/icons-vue";
 import {ElNotification} from "element-plus";
-import {FavoritesAdd, GetUserInfo, GetChatSessionId} from "../../api/BSideApi";
+import {FavoritesAdd, GetUserInfo, GetChatSessionId,GetSessionPage,GetDialogueList,deleteSession} from "../../api/BSideApi";
 import {useStore} from "vuex";
 import LoginDialog from "@/components/LoginDialog.vue";
 import InputFormField from "@/components/InputFormField.vue";
@@ -258,14 +227,14 @@ export default {
     let store = useStore();
     let scrollRef = ref(null);
     let input = ref("");
-    let conversationList = ref([]);
+    let dialogueList = ref([]);
     let loginVisible = ref(false);
     let socket = ref(null);
     let aiLoading = ref(false);
     let model = ref("BASIC");
     const imageUrl = ref("");
-    let dialogueDisplay = ref(false);
-    const dialogueCache = ref({});
+    let sessionDisplay = ref(false);
+    const sessionList = ref([]);
     const dialogueWidth = ref("30%");
     const rate = ref(50);
     const memory = ref(10);
@@ -280,31 +249,15 @@ export default {
       rate.value = parseInt(process.env.VUE_APP_RATE);
       memory.value = parseInt(process.env.VUE_APP_MEMORY);
       size.value = parseInt(process.env.VUE_APP_MEMORY_SIZE);
-      //获取对话缓存数据
-      let item = localStorage.getItem("dialogueCache");
+      
       if (store.getters.userinfo) {
         if (!store.getters.userinfo) return (loginVisible.value = true);
-        if (item) {
-          dialogueCache.value = JSON.parse(item);
-          let value = dialogueCache.value;
-          conversationList.value = value.array[value.index].context;
-          // TODO 滚动到底部
+        if (!gptSessionId) {
+          let res = GetDialogueList({sessionId : gptSessionId.value});
+          
+          dialogueList.value = res.rows;
+          // 滚动到底部
           scrollToTheBottom();
-        } else {
-          dialogueCache.value = {
-            index: 0,
-            array: [
-              {
-                title: "新对话",
-                time: Date.now(),
-                context: conversationList.value,
-              },
-            ],
-          };
-          localStorage.setItem(
-              "dialogueCache",
-              JSON.stringify(dialogueCache.value)
-          );
         }
       }
     });
@@ -330,14 +283,14 @@ export default {
     }
 
     // TODO 切换对话
-    function switchChat(index) {
-      dialogueCache.value.index = index;
-      conversationList.value = dialogueCache.value.array[index].context;
-      localStorage.setItem(
-          "dialogueCache",
-          JSON.stringify(dialogueCache.value)
-      );
-      dialogueDisplay.value = false;
+    function switchChat(sessionId) {
+      if (sessionId === '') {
+        return; 
+    }
+      const response = GetDialogueList({ sessionId: sessionId});
+  
+      dialogueList.value = response.rows;
+      sessionDisplay.value = false;
     }
 
     function calculateWidth(textLength) {
@@ -349,52 +302,14 @@ export default {
     }
 
     // TODO 清除指定对话
-    function clearDialogue(index) {
-      if (index !== dialogueCache.value.index) {
-        let i = parseInt(dialogueCache.value.index);
-        if (index < i) {
-          dialogueCache.value.index = i - 1;
-        }
-        dialogueCache.value.array.splice(index, 1);
-      }
-      localStorage.setItem(
-          "dialogueCache",
-          JSON.stringify(dialogueCache.value)
-      );
+    function clearDialogue(sessionId) {
+      deleteSession({sessionId: sessionId});
     }
 
     // TODO 写入对话数据
     function writeDialogue() {
-      let item = conversationList.value;
-      let value = dialogueCache.value;
-      dialogueCache.value.array[value.index].time = Date.now();
-      if (item.length > 0) {
-        dialogueCache.value.array[value.index].title = item[
-        item.length - 1
-            ].user
-            .trim()
-            .slice(0, 25);
-      }
-      dialogueCache.value.array[value.index].context = item;
-      localStorage.setItem(
-          "dialogueCache",
-          JSON.stringify(dialogueCache.value)
-      );
-    }
-
-    // TODO 创建新对话
-    function createdNewChat() {
-      dialogueCache.value.array.unshift({
-        title: "新对话",
-        time: Date.now(),
-        context: [],
-      });
-      dialogueCache.value.index = 0;
-      conversationList.value = [];
-      localStorage.setItem(
-          "dialogueCache",
-          JSON.stringify(dialogueCache.value)
-      );
+      
+      
     }
 
     // TODO 提交问题
@@ -410,65 +325,31 @@ export default {
       // 去除空字符串 如果等于空直接 结束
       if (input.value.trim() === "") return;
 
-      // 获取对话记录长度
-      let index = conversationList.value.length;
-
       // 获取输入内容
-      let content = input.value;
+      let question = input.value;
+
+      // 获取对话记录长度
+      dialogueList.value.push({role: 'user', content : question});
+      
       // 清空内容
-      // input.value = "";
       inputRef.value.resetInputValue();
-      // 将对话内容push进整个会话
-      conversationList.value.push({
-        user: content,
-      });
+      
       aiLoading.value = true;
-      // TODO 滚动到底部
+      // 滚动到底部
       scrollToTheBottom();
-      // TODO 上下文
-      let messages = [];
       if(!gptSessionId.value) {
         let gptSessionVo = await GetChatSessionId();
         gptSessionId.value = gptSessionVo.sessionId;
       }
-      conversationList.value
-          .slice(-memory.value)
-          .forEach(({isError, user, assistant}, index, arr) => {
-            if (!isError) {
-              let truncatedUser = user
-              let truncatedAssistant = assistant
-              if (arr.length > 2) {
-                if (index !== arr.length - 1 && index !== arr.length - 2) {
-                  truncatedUser =
-                      user.length > size.value ? user.slice(0, size.value) + "..." : user;
-                  truncatedAssistant =
-                      assistant && assistant.length > size.value
-                          ? assistant.slice(0, size.value) + "..."
-                          : assistant;
-                }
-              }
-              messages.push({
-                role: "user",
-                content: truncatedUser,
-              });
-              if (truncatedAssistant) {
-                messages.push({
-                  role: "assistant",
-                  content: truncatedAssistant,
-                });
-              }
-            }
-
-          });
+      dialogueList.value.push({role: 'assistant', content : ''});
+      let index = dialogueList.value.length - 1;
       webSocket({
-        messages: {
-          messages: messages,
-        },
+        question: question,
         index: index,
       });
     }
 
-    function webSocket({messages, index}) {
+    function webSocket({question, index}) {
       if (typeof WebSocket == "undefined") {
         console.log("您的浏览器不支持WebSocket");
       } else {
@@ -478,8 +359,6 @@ export default {
         }
 
         // 发起websocket
-        console.log("发起websocket", model.value);
-
         socket.value = new WebSocket(
             process.env.VUE_APP_WSS +
             "/gpt-web/api/" +
@@ -487,8 +366,8 @@ export default {
           );
         // TODO 建立连接
         socket.value.onopen = function () {
-          socket.value.send(JSON.stringify(messages));
-          conversationList.value[index].isError = true;
+
+          socket.value.send(question);
         };
         // TODO 接收消息
         socket.value.onmessage = function (news) {
@@ -529,15 +408,10 @@ export default {
 
         // eslint-disable-next-line no-inner-declarations
         function displayNextCharacter() {
-          const index = message.index;
           const msg = message.msg;
           const character = msg.charAt(i++);
           if (character) {
-            if (conversationList.value[index].assistant) {
-              conversationList.value[index].assistant += character;
-            } else {
-              conversationList.value[index].assistant = character;
-            }
+            dialogueList.value[message.index].content += character;
             scrollToTheBottom();
             setTimeout(displayNextCharacter, rate.value);
           } else {
@@ -556,10 +430,10 @@ export default {
       return new Promise((resolve) => {
         let interval = setInterval(() => {
           if (messageQueue.length === 0) {
-            let assistant = conversationList.value[index].assistant;
-            conversationList.value[index].isError = false;
-            if (!assistant) {
-              conversationList.value.splice(index, 1);
+            let role = dialogueList.value[index].role;
+            dialogueList.value[index].isError = false;
+            if (!(role === 'assistant')) {
+              dialogueList.value.splice(index, 1);
             }
             writeDialogue();
             getUser();
@@ -617,13 +491,12 @@ export default {
 
     function clear() {
       closeSocket();
-      conversationList.value = [];
-      writeDialogue();
+      dialogueList.value = [];
     }
 
     async function onCollection(item, index) {
       try {
-        let bol = !conversationList.value[index].isCollection;
+        let bol = !dialogueList.value[index].isCollection;
         if (bol) {
           try {
             await FavoritesAdd({
@@ -641,7 +514,7 @@ export default {
             });
           }
         }
-        conversationList.value[index].isCollection = true;
+        dialogueList.value[index].isCollection = true;
       } catch (e) {
         ElNotification({
           message: e,
@@ -657,7 +530,7 @@ export default {
       onSubmit,
       input,
       clear,
-      conversationList,
+      dialogueList,
       scrollRef,
       handleCopyCodeSuccess,
       loginVisible,
@@ -666,9 +539,8 @@ export default {
       aiLoading,
       closeSocket,
       imageUrl,
-      dialogueDisplay,
-      dialogueCache,
-      createdNewChat,
+      sessionDisplay,
+      sessionList,
       switchChat,
       clearDialogue,
       dialogueWidth,
