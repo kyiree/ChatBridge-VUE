@@ -207,8 +207,8 @@ export function GetRedemptionCodePage(a, b) {
  */
 export function DeleteProduct(data) {
     return request({
-        url: '/admin/product/delete/' + data,
-        method: 'POST'
+        url: '/admin/product/' + data,
+        method: 'DELETE'
     })
 }
 
@@ -218,7 +218,7 @@ export function DeleteProduct(data) {
  */
 export function AddProduct(data) {
     return request({
-        url: '/admin/product/put/data',
+        url: '/admin/product/data',
         method: 'POST',
         data
     })
@@ -227,10 +227,11 @@ export function AddProduct(data) {
 /**
  *   分页获取商品
  */
-export function GetProductPage(a, b) {
+export function GetProductPage(params) {
     return request({
-        url: '/admin/product/get/page?pageNum=' + a + '&prompt=' + b,
-        method: 'GET'
+        url: '/admin/product/page',
+        method: 'GET',
+        params
     })
 }
 
@@ -346,10 +347,11 @@ export function Favorites(data) {
 /**
  *    获取商品列表
  */
-export function GetProducts() {
+export function GetProducts(params) {
     return request({
-        url: '/pay/product/list',
-        method: 'GET'
+        url: '/pay/product/page',
+        method: 'GET',
+        params
     })
 }
 

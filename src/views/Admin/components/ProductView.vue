@@ -69,7 +69,7 @@
         <el-input
           autocomplete="off"
           style="width: 180px"
-          v-model="form.productName"
+          v-model="form.name"
         />
       </el-form-item>
     </el-form>
@@ -87,7 +87,7 @@
         <el-input
           autocomplete="off"
           style="width: 180px"
-          v-model="form.productPrice"
+          v-model="form.price"
         />
       </el-form-item>
     </el-form>
@@ -135,9 +135,9 @@ export default {
     let empty = ref(false);
     let error = ref(false);
     const form = ref({
-      productName: "",
+      name: "",
       frequency: undefined,
-      productPrice: undefined,
+      price: undefined,
     });
     onMounted(() => {
       if (store.getters.userinfo && store.getters.userinfo.type === "ADMIN") {
@@ -146,8 +146,7 @@ export default {
     });
 
     async function handleAddProduct() {
-      const { productPrice, productName, frequency } = form.value;
-      if (!productName) {
+      if (!form.value.name) {
         ElNotification({
           title: "错误",
           message: "商品名称不能为空",
@@ -155,7 +154,7 @@ export default {
         });
         return;
       }
-      if (!frequency) {
+      if (!form.value.frequency) {
         ElNotification({
           title: "错误",
           message: "所含Ai币不能为空",
@@ -163,7 +162,7 @@ export default {
         });
         return;
       }
-      if (!productPrice) {
+      if (!form.value.price) {
         ElNotification({
           title: "错误",
           message: "商品价格不能为空",
@@ -239,8 +238,8 @@ export default {
 
     async function handleCurrentChange(pageNum) {
       try {
-        let res = await GetProductPage(pageNum, prompt.value);
-        let records = res.records;
+        let res = await GetProductPage({current : pageNum, search : prompt.value});
+        let records = res.rows;
         if (records.length > 0) {
           for (const r of records) {
             r.createdTime = conversionTime(r.createdTime);
@@ -249,7 +248,7 @@ export default {
         } else {
           empty.value = true;
         }
-        current.value = res.current;
+        current.value = pageNum;
         total.value = res.total;
         load.value = false;
         error.value = false;

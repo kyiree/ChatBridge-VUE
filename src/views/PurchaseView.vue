@@ -48,7 +48,7 @@
               @click="payChoose(item.productId, item.frequency)"
             >
               <div class="wrapper-title">{{ item.productName }}</div>
-              <div class="quantity">{{ item.frequency }} Ai币</div>
+              <div class="quantity">{{ item.frequency }}币</div>
               <div class="quantity" style="font-size: 15px; padding-top: 10px">
                 ￥{{ item.productPrice }}
               </div>
@@ -158,9 +158,7 @@ export default {
     let loginVisible = ref(false);
     let store = useStore();
     const introduce = ref([
-      "双端次数同步",
       "全功能使用",
-      "(小程序)绘画自动保存",
     ]);
     const payVisible = ref(false);
     const productList = ref([]);
@@ -180,9 +178,9 @@ export default {
     async function init() {
       try {
         load.value = true;
-        const res = await GetProducts();
-        if (res.length) {
-          productList.value = res;
+        const res = await GetProducts({});
+        if (res.total > 0) {
+          productList.value = res.rows;
         } else {
           empty.value = true;
         }
