@@ -2,20 +2,6 @@
   <div class="s_container">
     <el-scrollbar height="100%">
       <el-form class="demo-form-inline" label-position="left">
-        <el-form-item label="小程序环境" label-width="200px">
-          <el-select v-model="form.wechatAppEnv" placeholder="小程序部署环境">
-            <el-option label="本地调试" value="develop" />
-            <el-option label="体验版本" value="trial" />
-            <el-option label="正式环境" value="release" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="拦截内容" label-width="200px">
-          <el-input
-            placeholder="如 (CHAT|GPT|OPENAI)"
-            clearable
-            v-model="form.sensitiveWords"
-          />
-        </el-form-item>
         <el-form-item label="代理地址(Clash)" label-width="200px">
           <el-input
             placeholder="如 127.0.0.1"
@@ -28,15 +14,6 @@
         </el-form-item>
         <el-form-item label="开启代理" label-width="200px">
           <el-switch v-model="form.enableProxy" />
-        </el-form-item>
-        <el-form-item label="文本拦截(小程序)" label-width="200px">
-          <el-switch v-model="form.enableSensitive" />
-        </el-form-item>
-        <el-form-item label="开启GPT-4" label-width="200px">
-          <el-switch v-model="form.enableGptPlus" />
-        </el-form-item>
-        <el-form-item label="小程序主页面" label-width="200px">
-          <el-switch v-model="form.enableWechatAppMain" />
         </el-form-item>
       </el-form>
 
@@ -67,14 +44,9 @@ export default {
   },
   setup: function () {
     let form = ref({
-      wechatAppEnv: "",
       proxyIp: "",
       proxyPort: undefined,
-      sensitiveWords: "",
-      enableSensitive: false,
-      enableGptPlus: false,
-      enableWechatAppMain: false,
-      enableProxy: false,
+      enableProxy: 'DISABLE',
     });
 
     onMounted(() => {
@@ -82,39 +54,7 @@ export default {
     });
     async function onSubmit() {
       let value = form.value;
-      if (!value.wechatAppEnv) {
-        ElNotification({
-          title: "错误",
-          message: "小程序环境不能为空",
-          type: "error",
-        });
-        return;
-      }
-      if (!value.proxyIp) {
-        ElNotification({
-          title: "错误",
-          message: "代理地址不能为空",
-          type: "error",
-        });
-        return;
-      }
-
-      if (!value.proxyPort) {
-        ElNotification({
-          title: "错误",
-          message: "代理端口不能为空",
-          type: "error",
-        });
-        return;
-      }
-      if (!value.sensitiveWords) {
-        ElNotification({
-          title: "错误",
-          message: "拦截文本不能为空",
-          type: "error",
-        });
-        return;
-      }
+      
       try {
         ElLoading.service({
           fullscreen: true,

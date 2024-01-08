@@ -2,73 +2,21 @@
   <div class="s_container">
     <el-scrollbar height="100%">
       <el-form :inline="true" class="demo-form-inline" label-position="left">
-        <el-form-item label="SD绘图请求链" label-width="200px">
-          <el-input
-            placeholder="请设置SD请求链"
-            clearable
-            v-model="form.sdUrl"
-          />
-        </el-form-item>
-        <el-form-item label="智能GPT对话请求链" label-width="200px">
-          <el-input
-            placeholder="请设置GPT请求链"
-            clearable
-            v-model="form.openAiUrl"
-          />
-        </el-form-item>
-        <el-form-item label="增强GPT对话请求链" label-width="200px">
+        <el-form-item label="OPEN AI 4.0 URL" label-width="200px">
           <el-input
             placeholder="请设置增强GPT请求链"
             clearable
             v-model="form.openAiPlusUrl"
           />
         </el-form-item>
-        <el-form-item label="智能GPT对话密钥" label-width="200px">
-          <el-input placeholder="请设置密钥" clearable v-model="form.openKey" />
-        </el-form-item>
-        <el-form-item label="增强GPT对话密钥" label-width="200px">
+        <el-form-item label="OPEN AI 4.0 KEY" label-width="200px">
           <el-input
             placeholder="请设置密钥"
             clearable
-            v-model="form.openPlusKey"
+            v-model="form.openAiPlusKey"
           />
         </el-form-item>
-        <el-form-item label="必应密钥" label-width="200px">
-          <el-input
-            placeholder="请设置密钥"
-            clearable
-            v-model="form.newBingCookie"
-          />
-        </el-form-item>
-        <el-form-item label="Claude原ID" label-width="200px">
-          <el-input
-            placeholder="请设置organizationUuid"
-            clearable
-            v-model="form.organizationUuid"
-          />
-        </el-form-item>
-        <el-form-item label="Claude连ID" label-width="200px">
-          <el-input
-            placeholder="请设置conversationUuid"
-            clearable
-            v-model="form.conversationUuid"
-          />
-        </el-form-item>
-        <el-form-item label="Claude密钥" label-width="200px">
-          <el-input
-            placeholder="请设置sessionKey"
-            clearable
-            v-model="form.sessionKey"
-          />
-        </el-form-item>
-        <el-form-item label="智能对话消耗次数" label-width="200px">
-          <el-input
-            placeholder="请设置消耗次数"
-            clearable
-            v-model="form.gptFrequency"
-          />
-        </el-form-item>
-        <el-form-item label="增强对话消耗次数" label-width="200px">
+        <el-form-item label="对话消耗次数" label-width="200px">
           <el-input
             placeholder="请设置消耗次数"
             clearable
@@ -96,20 +44,7 @@
             v-model="form.signInFrequency"
           />
         </el-form-item>
-        <el-form-item label="文生图(GPT)消耗次数" label-width="200px">
-          <el-input
-            placeholder="请设置消耗次数"
-            clearable
-            v-model="form.gptTextImageFrequency"
-          />
-        </el-form-item>
-        <el-form-item label="(SD)消耗次数" label-width="200px">
-          <el-input
-            placeholder="请设置消耗次数"
-            clearable
-            v-model="form.sdImageFrequency"
-          />
-        </el-form-item>
+    
       </el-form>
 
       <div class="btn-container">
@@ -139,22 +74,12 @@ export default {
   },
   setup() {
     const form = ref({
-      sdUrl: "",
-      openAiUrl: "",
       openAiPlusUrl: "",
-      openKey: "",
-      openPlusKey: "",
+      openAiPlusKey: "",
       gptPlusFrequency: undefined,
-      newBingCookie: "",
       incentiveFrequency: undefined,
       videoFrequency: undefined,
-      signInFrequency: undefined,
-      sdImageFrequency: undefined,
-      gptFrequency: undefined,
-      gptTextImageFrequency: undefined,
-      organizationUuid: "",
-      conversationUuid: "",
-      sessionKey: "",
+      signInFrequency: undefined
     });
 
     onMounted(() => {

@@ -11,17 +11,11 @@
         <el-tab-pane label="服务器配置" name="second">
           <server-panel-view />
         </el-tab-pane>
-        <el-tab-pane label="兑换管理" name="third">
-          <redemption-code-view />
-        </el-tab-pane>
         <el-tab-pane label="商品管理" name="four">
           <product-view />
         </el-tab-pane>
         <el-tab-pane label="订单数据" name="fifth">
           <orders-data-view />
-        </el-tab-pane>
-        <el-tab-pane label="模型管理" name="sixth">
-          <sd-model-view/>
         </el-tab-pane>
         <el-tab-pane label="终端控制" name="seventh">
           <control-panel-view />

@@ -92,7 +92,7 @@ export function GetPersonalityConfig() {
  */
 export function GetTerminal() {
     return request({
-        url: '/admin/server/get/terminal',
+        url: '/admin/server/terminal',
         method: 'GET'
     })
 }
@@ -102,8 +102,8 @@ export function GetTerminal() {
  */
 export function PutTerminal(data) {
     return request({
-        url: '/admin/server/put/terminal',
-        method: 'POST',
+        url: '/admin/server/terminal',
+        method: 'PUT',
         data
     })
 }
@@ -161,7 +161,7 @@ export function RetrieveEmailPassword(data) {
  */
 export function GetServerConfig() {
     return request({
-        url: '/admin/server/get/config',
+        url: '/admin/server/config',
         method: 'GET'
     })
 }
@@ -240,8 +240,8 @@ export function GetProductPage(a, b) {
  */
 export function PutServerConfig(data) {
     return request({
-        url: '/admin/server/put/config',
-        method: 'POST',
+        url: '/admin/server/config',
+        method: 'PUT',
         data
     })
 }
