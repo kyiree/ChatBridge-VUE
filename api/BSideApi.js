@@ -252,8 +252,8 @@ export function PutServerConfig(data) {
  */
 export function UpdateUserInfo(data) {
     return request({
-        url: '/admin/user/put/data',
-        method: 'POST',
+        url: '/admin/user/' + data.userId,
+        method: 'PUT',
         data
     })
 }
