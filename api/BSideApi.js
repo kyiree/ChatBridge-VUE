@@ -218,7 +218,7 @@ export function DeleteProduct(data) {
  */
 export function AddProduct(data) {
     return request({
-        url: '/admin/product/data',
+        url: '/admin/product',
         method: 'POST',
         data
     })
