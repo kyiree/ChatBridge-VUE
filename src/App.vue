@@ -43,7 +43,7 @@
 import { useStore } from "vuex";
 import LeftNavigationBar from "@/components/LeftNavigationBar.vue";
 import NavigationBar from "@/components/NavigationBar.vue";
-import { getAnnouncement } from "../api/BSideApi";
+import { GetAnnouncement } from "../api/BSideApi";
 import { onMounted, ref } from "vue";
 
 export default {
@@ -70,7 +70,7 @@ export default {
 
     async function getAnnouncementData() {
       try {
-        let announcement = await getAnnouncement();
+        let announcement = await GetAnnouncement();
         if (announcement) {
           let item = localStorage.getItem("announcement");
           if (item !== null) {

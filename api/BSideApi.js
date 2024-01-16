@@ -109,6 +109,17 @@ export function PutTerminal(data) {
 }
 
 /**
+ *   更新公告
+ */
+export function PutAnnouncement(data) {
+    return request({
+        url: '/admin/announcement',
+        method: 'PUT',
+        data
+    })
+}
+
+/**
  *    获取分页用户数据
  */
 export function GetUserPage(params) {
@@ -272,9 +283,9 @@ export function Logout() {
 /**
  *    获取公告
  */
-export function getAnnouncement() {
+export function GetAnnouncement() {
     return request({
-        url: '/public/get/announcement',
+        url: '/public/announcement',
         method: 'GET'
     })
 }

@@ -20,6 +20,9 @@
         <el-tab-pane label="终端控制" name="seventh">
           <control-panel-view />
         </el-tab-pane>
+        <el-tab-pane label="公告栏" name="eighth">
+          <control-announcement-view />
+        </el-tab-pane>
       </el-tabs>
       <div v-else class="no_data">
         <ViewState class="state" Type="error" ErrorText="当前页面不见了" />
@@ -39,6 +42,7 @@ import ProductView from "@/views/Admin/components/ProductView.vue";
 import OrdersDataView from "@/views/Admin/components/OrdersDataView.vue";
 import ViewState from "@/components/ViewState.vue";
 import ControlPanelView from "@/views/Admin/components/ControlPanelView.vue";
+import ControlAnnouncementView from "@/views/Admin/components/ControlAnnouncementView.vue";
 
 export default {
   name: "PromptList",
@@ -50,7 +54,8 @@ export default {
     RedemptionCodeView,
     ServerPanelView,
     UserPanelView,
-    SdModelView
+    SdModelView,
+    ControlAnnouncementView
   },
   computed: {
     store() {
