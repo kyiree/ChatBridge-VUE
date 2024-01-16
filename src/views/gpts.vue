@@ -64,16 +64,14 @@
     </div>
     
     <el-dialog v-model="dialogVisible" title="历史对话">
-      <p>{</p>
       <div v-for="(dialogue, index) in dialogueList" :key="index" class="dialogue-item">
-        <div v-if="dialogue.role === 'user'" class="assistant-content">
-          <p>"user" : "{{ dialogue.content }}"</p>
+        <div v-if="dialogue.role === 'user'" class="user-content">
+          <p>{{ dialogue.content }}</p>
         </div>
         <div v-else class="assistant-content">
-          <p>"assistant" : "{{ dialogue.content }}"</p>
+          <p>{{ dialogue.content }}</p>
         </div>
       </div>
-      <p>}</p>
     </el-dialog>
   </div>
   <LoginDialog

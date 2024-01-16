@@ -90,6 +90,17 @@ const routes = [{
         }
     },
     {
+        path: '/gpts',
+        name: 'gpts',
+        component: () => import('../views/gpts.vue'),
+        meta: {
+            title: '强力工具',
+            isHeadNavigation: true,
+            keepAlive: false,
+            isLeftMenu: true
+        }
+    },
+    {
         path: "/exchange",
         name: "Exchange",
         component: () => import('../views/ExchangeView.vue'),

@@ -74,7 +74,7 @@
 import {defineComponent, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 // eslint-disable-next-line no-unused-vars
-import {ChatDotSquare, MessageBox, Odometer, ScaleToOriginal, UserFilled,} from "@element-plus/icons-vue";
+import {Operation,ChatDotSquare, MessageBox, Odometer, ScaleToOriginal, UserFilled,} from "@element-plus/icons-vue";
 import router from "@/router";
 import store from "../store";
 import LoginDialog from "@/components/LoginDialog.vue";
@@ -108,6 +108,11 @@ export default defineComponent({
         icon: ChatDotSquare,
         to: "/",
       },
+     /**  {
+        title: "强力工具",
+        icon: Operation,
+        to: "/gpts",
+      }, */
       {
         title: "历史对话",
         icon: MessageBox,
