@@ -23,6 +23,9 @@
         <el-tab-pane label="公告栏" name="eighth">
           <control-announcement-view />
         </el-tab-pane>
+        <el-tab-pane label="邮箱配置" name="nine">
+          <control-mail-view />
+        </el-tab-pane>
       </el-tabs>
       <div v-else class="no_data">
         <ViewState class="state" Type="error" ErrorText="当前页面不见了" />
@@ -43,6 +46,7 @@ import OrdersDataView from "@/views/Admin/components/OrdersDataView.vue";
 import ViewState from "@/components/ViewState.vue";
 import ControlPanelView from "@/views/Admin/components/ControlPanelView.vue";
 import ControlAnnouncementView from "@/views/Admin/components/ControlAnnouncementView.vue";
+import ControlMailView from "@/views/Admin/components/ControlMailView.vue";
 
 export default {
   name: "PromptList",
@@ -55,7 +59,8 @@ export default {
     ServerPanelView,
     UserPanelView,
     SdModelView,
-    ControlAnnouncementView
+    ControlAnnouncementView,
+    ControlMailView,
   },
   computed: {
     store() {

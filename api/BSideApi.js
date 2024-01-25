@@ -98,11 +98,32 @@ export function GetTerminal() {
 }
 
 /**
+ *    获取发送邮箱
+ */
+export function GetMail() {
+    return request({
+        url: '/admin/server/mail',
+        method: 'GET'
+    })
+}
+
+/**
  *   更新终端数据
  */
 export function PutTerminal(data) {
     return request({
         url: '/admin/server/terminal',
+        method: 'PUT',
+        data
+    })
+}
+
+/**
+ *   更新发送邮箱
+ */
+export function PutMail(data) {
+    return request({
+        url: '/admin/server/mail',
         method: 'PUT',
         data
     })
